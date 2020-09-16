@@ -24,6 +24,11 @@ router.get("/:uid", (req, res, next) => {
   user = USERS.find((u) => {
     return u.id === userId;
   });
+  if (!user) {
+    const error = new Error("tidak ada user dengan id ini");
+    error.code = 404;
+    throw error;
+  }
   res.json({ user });
 });
 

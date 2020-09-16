@@ -36,6 +36,11 @@ router.get("/:pid", (req, res, next) => {
   place = DUMMY_PLACES.find((p) => {
     return p.id === placeId;
   });
+  if (!place) {
+    const error = new Error("tidak ada tempat dengan id ini");
+    error.code = 404;
+    throw error;
+  }
   res.json({ place });
 });
 
@@ -44,6 +49,11 @@ router.get("/user/:uid", (req, res, next) => {
   places = DUMMY_PLACES.find((p) => {
     return p.creator === userId;
   });
+  if (!places) {
+    const error = new Error("tidak ada tempat dengan user id ini");
+    error.code = 404;
+    return next(error);
+  }
   res.json({ places });
 });
 
