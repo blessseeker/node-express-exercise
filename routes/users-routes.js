@@ -1,35 +1,9 @@
 const express = require("express");
 
-const HttpError = require("../models/http-error");
+const usersController = require("../controllers/users-controllers");
 
 const router = express.Router();
 
-const USERS = [
-  {
-    id: "u1",
-    name: "Kamaludin Khoir",
-    image:
-      "https://cdn.idntimes.com/content-images/avatar/kamaludin-khoir_200x200.jpg?v=80782c83ffa0f09ef565e33687c7ed8b",
-    places: 1,
-  },
-  {
-    id: "u2",
-    name: "Usi Supinar",
-    image:
-      "https://pbs.twimg.com/profile_images/852513364550877184/922tr-_V.jpg",
-    places: 2,
-  },
-];
-
-router.get("/:uid", (req, res, next) => {
-  userId = req.params.uid;
-  user = USERS.find((u) => {
-    return u.id === userId;
-  });
-  if (!user) {
-    throw new HttpError("tidak ada user dengan id ini", 404);
-  }
-  res.json({ user });
-});
+router.get("/:uid", usersController.getUserbyId);
 
 module.exports = router;
