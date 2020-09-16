@@ -1,5 +1,7 @@
 const express = require("express");
 
+const HttpError = require("../models/http-error");
+
 const router = express.Router();
 
 const USERS = [
@@ -25,9 +27,7 @@ router.get("/:uid", (req, res, next) => {
     return u.id === userId;
   });
   if (!user) {
-    const error = new Error("tidak ada user dengan id ini");
-    error.code = 404;
-    throw error;
+    throw new HttpError("tidak ada user dengan id ini", 404);
   }
   res.json({ user });
 });

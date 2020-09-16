@@ -1,5 +1,7 @@
 const express = require("express");
 
+const HttpError = require("../models/http-error");
+
 const router = express.Router();
 
 const DUMMY_PLACES = [
@@ -37,9 +39,7 @@ router.get("/:pid", (req, res, next) => {
     return p.id === placeId;
   });
   if (!place) {
-    const error = new Error("tidak ada tempat dengan id ini");
-    error.code = 404;
-    throw error;
+    throw new HttpError("tidak ada tempat dengan id ini", 404);
   }
   res.json({ place });
 });
@@ -50,9 +50,7 @@ router.get("/user/:uid", (req, res, next) => {
     return p.creator === userId;
   });
   if (!places) {
-    const error = new Error("tidak ada tempat dengan user id ini");
-    error.code = 404;
-    return next(error);
+    return next(new HttpError("tidak ada tempat dengan user id ini", 404));
   }
   res.json({ places });
 });
