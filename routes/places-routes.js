@@ -39,4 +39,12 @@ router.get("/:pid", (req, res, next) => {
   res.json({ place });
 });
 
+router.get("/user/:uid", (req, res, next) => {
+  userId = req.params.uid;
+  places = DUMMY_PLACES.find((p) => {
+    return p.creator === userId;
+  });
+  res.json({ places });
+});
+
 module.exports = router;
