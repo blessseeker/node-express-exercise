@@ -1,55 +1,71 @@
 const HttpError = require("../models/http-error");
 
+const { v4: uuidv4 } = require("uuid");
+
 const DUMMY_PLACES = [
   {
     id: "p1",
-    title: "Batu Kuda",
-    description: "Wisata Pinus",
-    imageUrl:
-      "https://cdn.ayobandung.com/images-bandung/post/articles/2018/01/06/27192/whatsapp_image_2018-01-06_at_20.05.17.jpeg",
-    address: "Cibiru Wetan, Cileunyi, Bandung, Jawa Barat 40625",
-    location: {
-      lat: -6.8936106,
-      lng: 107.7425512,
-    },
-    creator: "u1",
-  },
-  {
-    id: "p2",
     title: "Empire State Building",
     description: "One of the most famous sky scrapers in the world!",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg",
-    address: "20 W 34th St, New York, NY 10001",
     location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
+      lat: 40.7484474,
+      lng: -73.9871516,
     },
-    creator: "u2",
+    address: "20 W 34th St, New York, NY 10001",
+    creator: "u1",
   },
 ];
 
-const getPlacebyId = (req, res, next) => {
-  placeId = req.params.pid;
-  place = DUMMY_PLACES.find((p) => {
+const getPlaceById = (req, res, next) => {
+  const placeId = req.params.pid; // { pid: 'p1' }
+
+  const place = DUMMY_PLACES.find((p) => {
     return p.id === placeId;
   });
+
   if (!place) {
-    throw new HttpError("tidak ada tempat dengan id ini", 404);
+    throw new HttpError("Could not find a place for the provided id.", 404);
   }
+
+  res.json({ place }); // => { place } => { place: place }
+};
+
+// function getPlaceById() { ... }
+// const getPlaceById = function() { ... }
+
+const getPlaceByUserId = (req, res, next) => {
+  const userId = req.params.uid;
+
+  const place = DUMMY_PLACES.find((p) => {
+    return p.creator === userId;
+  });
+
+  if (!place) {
+    return next(
+      new HttpError("Could not find a place for the provided user id.", 404)
+    );
+  }
+
   res.json({ place });
 };
 
-const getPlacebyUserId = (req, res, next) => {
-  userId = req.params.uid;
-  places = DUMMY_PLACES.find((p) => {
-    return p.creator === userId;
-  });
-  if (!places) {
-    return next(new HttpError("tidak ada tempat dengan user id ini", 404));
-  }
-  res.json({ places });
+const createPlace = (req, res, next) => {
+  const { title, description, coordinates, address, creator } = req.body;
+  // const title = req.body.title;
+  const createdPlace = {
+    id: uuidv4(),
+    title,
+    description,
+    location: coordinates,
+    address,
+    creator,
+  };
+
+  DUMMY_PLACES.push(createdPlace); //unshift(createdPlace)
+
+  res.status(201).json({ place: createdPlace });
 };
 
-exports.getPlacebyId = getPlacebyId;
-exports.getPlacebyUserId = getPlacebyUserId;
+exports.getPlaceById = getPlaceById;
+exports.getPlaceByUserId = getPlaceByUserId;
+exports.createPlace = createPlace;
