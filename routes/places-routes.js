@@ -12,15 +12,20 @@ router.get("/user/:uid", placesController.getPlacesByUserId);
 
 router.post(
   "/",
+
   [
     check("title").not().isEmpty(),
-    check("description").isLength(10),
+    check("description").isLength({ min: 5 }),
     check("address").not().isEmpty(),
   ],
   placesController.createPlace
 );
 
-router.patch("/:pid", placesController.updatePlace);
+router.patch(
+  "/:pid",
+  [check("title").not().isEmpty(), check("description").isLength({ min: 5 })],
+  placesController.updatePlace
+);
 
 router.delete("/:pid", placesController.deletePlace);
 

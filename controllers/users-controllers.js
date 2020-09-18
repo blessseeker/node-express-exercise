@@ -2,6 +2,8 @@ const HttpError = require("../models/http-error");
 
 const { v4: uuid } = require("uuid");
 
+const { validationResult } = require("express-validator");
+
 const USERS = [
   {
     id: "u1",
@@ -39,6 +41,12 @@ const getUserbyId = (req, res, next) => {
 };
 
 const signup = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError("Inputan Anda tidak valid", 422);
+  }
   const { name, email, password } = req.body;
 
   const checkUser = USERS.find((u) => u.email === email);
