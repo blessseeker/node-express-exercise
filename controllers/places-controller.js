@@ -6,30 +6,7 @@ const { validationResult } = require("express-validator");
 
 const getCoordsforAddress = require("../utils/location");
 
-let DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 34th St, New York, NY 10001",
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 34th St, New York, NY 10001",
-    creator: "u1",
-  },
-];
+const Place = require("../models/place");
 
 const getPlaceById = (req, res, next) => {
   const placeId = req.params.pid; // { pid: 'p1' }
@@ -83,16 +60,22 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuidv4(),
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    image:
+      "https://avatars1.githubusercontent.com/u/45768002?s=460&u=924d9d528e7b0b87171eb5e978e2bd5d3f50f1a1&v=4",
+    location: coordinates,
     creator,
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace); //unshift(createdPlace)
+  try {
+    await createdPlace.save();
+  } catch (err) {
+    const error = new HttpError("Gagal menginput tempat, coba lagi!", 500);
+    return next(error);
+  }
 
   res.status(201).json({ place: createdPlace });
 };

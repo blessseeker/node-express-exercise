@@ -28,7 +28,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb://root:root@localhost:27017/merncourse?authSource=admin&readPreference=primary"
+    "mongodb://root:root@localhost:27017/place_db?authSource=admin&readPreference=primary"
   )
   .then(() => {
     app.listen(5000);
