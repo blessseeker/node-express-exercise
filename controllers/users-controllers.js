@@ -69,13 +69,23 @@ const signup = async (req, res, next) => {
   res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = USERS.find((u) => u.email === email);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Terjadi kesalahan! Coba beberapa saat lagi",
+      500
+    );
+    return next(error);
+  }
 
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError("email atau password salah", 401);
+  if (!existingUser || password != existingUser.password) {
+    const error = new HttpError("Kredensial yang Anda masukkan salah!", 401);
+    return next(error);
   }
 
   res.json({ message: "Anda berhasil login" });
