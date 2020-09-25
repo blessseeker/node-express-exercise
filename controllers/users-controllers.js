@@ -4,26 +4,7 @@ const { v4: uuid } = require("uuid");
 
 const { validationResult } = require("express-validator");
 
-const USERS = [
-  {
-    id: "u1",
-    name: "Kamaludin Khoir",
-    email: "khoirkamaludin@gmail.com",
-    password: "rahasia",
-    image:
-      "https://cdn.idntimes.com/content-images/avatar/kamaludin-khoir_200x200.jpg?v=80782c83ffa0f09ef565e33687c7ed8b",
-    places: 1,
-  },
-  {
-    id: "u2",
-    name: "Usi Supinar",
-    email: "usisupinar@gmail.com",
-    password: "gakboleh",
-    image:
-      "https://pbs.twimg.com/profile_images/852513364550877184/922tr-_V.jpg",
-    places: 2,
-  },
-];
+const User = require("../models/user");
 
 const getUsers = (req, res, next) => {
   res.json({ users: USERS });
@@ -40,30 +21,52 @@ const getUserbyId = (req, res, next) => {
   res.json({ user });
 };
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError("Inputan Anda tidak valid", 422);
+    return next(new HttpError("Inputan Anda tidak valid", 422));
   }
-  const { name, email, password } = req.body;
+  const { name, email, password, places } = req.body;
 
-  const checkUser = USERS.find((u) => u.email === email);
-  if (checkUser) {
-    throw new HttpError("Email telah terdaftar! Tidak bisa digunakan", 422);
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (err) {
+    const error = new HttpError(
+      "Terjadi kesalahan! Silakan kembali lagi nanti",
+      500
+    );
+    return next(error);
   }
 
-  const createdUser = {
-    id: uuid(),
+  if (existingUser) {
+    return next(
+      new HttpError(
+        "Email yang Anda input telah digunakan oleh pengguna lain!",
+        422
+      )
+    );
+  }
+
+  const createdUser = new User({
     name,
     email,
+    image:
+      "https://avatars1.githubusercontent.com/u/45768002?s=460&u=924d9d528e7b0b87171eb5e978e2bd5d3f50f1a1&v=4",
     password,
-  };
+    places,
+  });
 
-  USERS.push(createdUser);
+  try {
+    await createdUser.save();
+  } catch (err) {
+    const error = new HttpError("Gagal menambahkan data!", 500);
+    return next(error);
+  }
 
-  res.status(201).json({ user: createdUser });
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
 const login = (req, res, next) => {
