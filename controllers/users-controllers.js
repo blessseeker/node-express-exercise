@@ -39,7 +39,7 @@ const signup = async (req, res, next) => {
     console.log(errors);
     return next(new HttpError("Inputan Anda tidak valid", 422));
   }
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -67,7 +67,7 @@ const signup = async (req, res, next) => {
     image:
       "https://avatars1.githubusercontent.com/u/45768002?s=460&u=924d9d528e7b0b87171eb5e978e2bd5d3f50f1a1&v=4",
     password,
-    places,
+    places: [],
   });
 
   try {
