@@ -97,7 +97,10 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ message: "Anda berhasil login" });
+  res.json({
+    message: "Anda berhasil login",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getUsers = getUsers;
